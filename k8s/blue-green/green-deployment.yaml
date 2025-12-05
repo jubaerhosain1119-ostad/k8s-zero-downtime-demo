@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: node-app
-          image: YOUR_DOCKER_USERNAME/k8s-zero-downtime:v2
+          image: jubaerhosain/k8s-zero-downtime:v2
           ports:
             - containerPort: 3000
           env:
