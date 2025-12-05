@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: node-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: node-app
+        version: blue
+    spec:
+      containers:
+        - name: node-app
+          image: jubaerhosain/k8s-zero-downtime:v1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_VERSION
+              value: "v1"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
