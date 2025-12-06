@@ -8,6 +8,10 @@ app.get("/", (req, res) => {
   res.send(`Hello from Node.js app - Version: ${VERSION}`);
 });
 
+app.get("/random-number", (req, res) => {
+  res.send(`${Math.round(Math.random() * 100)} - Version: ${VERSION}`);
+});
+
 app.get("/healthz", (req, res) => {
   res.status(200).json({ status: "ok", version: VERSION });
 });
