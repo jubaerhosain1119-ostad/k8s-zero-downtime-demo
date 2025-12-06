@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: node-app-canary
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      canaryService: node-app-canary-canary
+      stableService: node-app-canary-stable
+      steps:
+        - setWeight: 20
+        - pause: {duration: 20}    # wait 20s at 20%
+        - setWeight: 50
+        - pause: {duration: 20}    # wait 20s at 50%
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app: node-app-canary
+  template:
+    metadata:
+      labels:
+        app: node-app-canary
+    spec:
+      containers:
+        - name: node-app
+          image: jubaerhosain/k8s-zero-downtime:v1
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5

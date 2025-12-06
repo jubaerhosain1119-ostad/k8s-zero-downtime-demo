@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-rolling
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1         # allow 1 extra pod during update
+      maxUnavailable: 0   # 0 pods can be unavailable -> zero downtime
+  selector:
+    matchLabels:
+      app: node-app-rolling
+  template:
+    metadata:
+      labels:
+        app: node-app-rolling
+    spec:
+      containers:
+        - name: node-app
+          image: jubaerhosain/k8s-zero-downtime:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app'] # (optional) or set directly
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
